@@ -8,6 +8,6 @@ export default function useTheme() {
   }
   return {
     theme,
-    changeTheme,
+    changeTheme
   };
 }

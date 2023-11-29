@@ -16,7 +16,7 @@ import {
   BufferGeometry,
   Line,
   Vector3,
-  BufferAttribute,
+  BufferAttribute
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { geoMercator } from 'd3-geo';
@@ -135,7 +135,7 @@ export class CityThree {
         });
       });
     });
-    console.log('newmap', this.mapData);
+    console.log('new map', this.mapData);
     // 绘制地图模型
     const group = new Group();
     const lineGroup = new Group();
@@ -265,13 +265,13 @@ export class CityThree {
 
     const geometry = new ExtrudeGeometry(shape, {
       amount: height || -2,
-      bevelEnabled: false,
+      bevelEnabled: false
     });
     const material = new MeshBasicMaterial({
       color: this.color,
       transparent: true,
       opacity: 0.6,
-      side: DoubleSide,
+      side: DoubleSide
     });
     return new Mesh(geometry, material);
   }
@@ -283,7 +283,7 @@ export class CityThree {
     const material = new LineBasicMaterial({
       color: '#ccc',
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.7
     });
     const vector3s = [];
     const geometry = new BufferGeometry();
