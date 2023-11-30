@@ -7,17 +7,23 @@ import {
   Mesh,
   WebGLRenderer,
   AxesHelper,
-  Clock, OrthographicCamera
+  Clock,
+  OrthographicCamera, BufferGeometry, BufferAttribute,
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import gsap from 'gsap'
+import {render} from "react-dom";
 
 console.log('OrbitControls', OrbitControls)
 const scene = new Scene();
+const sizes = {
+  width: window.innerWidth,
+  height: window.innerHeight
+}
 // 透视相机
 const camera = new PerspectiveCamera(
   75,
-  window.innerWidth / window.innerHeight, 1, 1000
+    sizes.width / sizes.height, 0.1, 1000
 );
 
 // camera
@@ -28,10 +34,29 @@ const camera = new PerspectiveCamera(
 camera.position.z = 2;
 
 // red cube
-const geometry = new BoxGeometry(1, 1, 1);
+// const geometry = new BoxGeometry(1, 1, 1, 10, 10 , 10 );
+
+const geometry = new BufferGeometry()
+const indices = [
+  0, 1, 2,
+  2, 3, 0,
+];
+const vertices = new Float32Array( [
+  -1.0, -1.0,  1.0, // v0
+  1.0, -1.0,  1.0, // v1
+  1.0,  1.0,  1.0, // v2
+
+  1.0,  1.0,  1.0, // v3
+  -1.0,  1.0,  1.0, // v4
+  -1.0, -1.0,  1.0  // v5
+] );
+// 位置的顺序 索引
+geometry.setIndex(indices)
+geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
 
 const material = new MeshBasicMaterial({
-  color: 0xff0000
+  color: 0xff0000,
+  wireframe: true
 });
 
 const mesh = new Mesh(geometry, material);
@@ -46,12 +71,14 @@ scene.add(axesHelper);
 
 window.onload = () => {
   const canvas = document.createElement('canvas');
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.width = sizes.width
+  canvas.height = sizes.height;
   const renderer = new WebGLRenderer({
     canvas
   });
-  document.querySelector('#root')?.appendChild(canvas);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  document.querySelector('#root')?.append(renderer.domElement);
+
   console.log('canvas.width, canvas.height', canvas.width, canvas.height);
   renderer.setSize(canvas.width, canvas.height);
   renderer.domElement.className = 'webgl'
@@ -59,6 +86,7 @@ window.onload = () => {
   controls.enableDamping = true
   controls.dampingFactor = 0.05
   controls.update()
+  // document.getElementById('root').appendChild(renderer.domElement)
   // time 存储事件
  //  let time = Date.now();
   // 解决方法二
@@ -100,4 +128,33 @@ window.onload = () => {
   //   cursor.y = -(event.clientY / window.innerHeight - 0.5);
   //   console.log(cursor)
   // })
+  // 像素比 pixel ratio
+  window.addEventListener('resize', event => {
+    console.log(1111)
+    sizes.width = window.innerWidth;
+    sizes.height = window.innerHeight;
+    camera.aspect = sizes.width / sizes.height;
+    camera.updateProjectionMatrix()
+    // 对应切换屏幕的时候 做的操作防止他出现锯齿
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    renderer.setSize(sizes.width, sizes.height);
+
+  })
+
+  window.addEventListener('dblclick', function () {
+    const fullScreenElement = document.fullscreenElement || document.webkitFullscreenElement;
+    if (fullScreenElement !==  renderer.domElement) {
+      if ( renderer.domElement.requestFullscreen) {
+        renderer.domElement.requestFullscreen()
+      } else if (renderer.domElement.webkitRequestFullscreen) {
+        renderer.domElement.webkitRequestFullscreen()
+      }
+    } else {
+      if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen()
+      } else if( document.exitFullscreen) {
+        document.exitFullscreen()
+      }
+    }
+  })
 };

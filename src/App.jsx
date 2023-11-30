@@ -7,7 +7,7 @@ import cityData from './assets/building_waiwei_all.json';
 import Child from './views/index';
 import './App.css';
 import AuthRoute from './views/AuthRoute';
-import '../src/three/4.js';
+import '../src/three/6.js';
 function App(props) {
   console.log('props', props);
   useEffect(() => {
