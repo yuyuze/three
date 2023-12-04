@@ -7,23 +7,20 @@ import {
   Mesh,
   WebGLRenderer,
   AxesHelper,
-  Clock, OrthographicCamera
+  Clock,
+  OrthographicCamera
 } from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import gsap from 'gsap'
-import {render} from "react-dom";
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import gsap from 'gsap';
 
-console.log('OrbitControls', OrbitControls)
+console.log('OrbitControls', OrbitControls);
 const scene = new Scene();
 const sizes = {
   width: window.innerWidth,
   height: window.innerHeight
-}
+};
 // 透视相机
-const camera = new PerspectiveCamera(
-  75,
-    sizes.width / sizes.height, 0.1, 1000
-);
+const camera = new PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 1000);
 
 // camera
 // 自动拍照相机
@@ -44,38 +41,38 @@ const mesh = new Mesh(geometry, material);
 camera.lookAt(mesh.position);
 
 scene.add(camera);
-scene.add(mesh)
+scene.add(mesh);
 // Axes helper
 const axesHelper = new AxesHelper(5);
 scene.add(axesHelper);
 
 window.onload = () => {
   const canvas = document.createElement('canvas');
-  canvas.width = sizes.width
+  canvas.width = sizes.width;
   canvas.height = sizes.height;
   const renderer = new WebGLRenderer({
     canvas
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   document.querySelector('#root')?.appendChild(canvas);
-  console.log('111',document.querySelector('#root'),canvas)
+  console.log('111', document.querySelector('#root'), canvas);
 
   console.log('canvas.width, canvas.height', canvas.width, canvas.height);
   renderer.setSize(canvas.width, canvas.height);
-  renderer.domElement.className = 'webgl'
-  const controls = new OrbitControls( camera, renderer.domElement );
-  controls.enableDamping = true
-  controls.dampingFactor = 0.05
-  controls.update()
+  renderer.domElement.className = 'webgl';
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.05;
+  controls.update();
   // document.getElementById('root').appendChild(renderer.domElement)
   // time 存储事件
- //  let time = Date.now();
+  //  let time = Date.now();
   // 解决方法二
-  const clock = new Clock()
+  const clock = new Clock();
   const cursor = {
     x: 0,
-    y: 0,
-  }
+    y: 0
+  };
   function tick() {
     // // 如何固定帧率 解决方法一
     // const currentTime = Date.now();
@@ -96,13 +93,13 @@ window.onload = () => {
     // camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 3;
     // // up是正的所以要负号
     // camera.position.y = cursor.y * 3;
-    camera.lookAt((mesh.position))
-    controls.update()
+    camera.lookAt(mesh.position);
+    controls.update();
     // render
     renderer.render(scene, camera);
     window.requestAnimationFrame(tick);
   }
-  tick()
+  tick();
 
   // window.addEventListener('mousemove', event => {
   //   cursor.x = event.clientX / window.innerWidth - 0.5;
@@ -110,32 +107,32 @@ window.onload = () => {
   //   console.log(cursor)
   // })
   // 像素比 pixel ratio
-  window.addEventListener('resize', event => {
-    console.log(1111)
+  window.addEventListener('resize', (event) => {
+    console.log(1111);
     sizes.width = window.innerWidth;
     sizes.height = window.innerHeight;
     camera.aspect = sizes.width / sizes.height;
-    camera.updateProjectionMatrix()
+    camera.updateProjectionMatrix();
     // 对应切换屏幕的时候 做的操作防止他出现锯齿
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(sizes.width, sizes.height);
-
-  })
+  });
 
   window.addEventListener('dblclick', function () {
-    const fullScreenElement = document.fullscreenElement || document.webkitFullscreenElement;
-    if (fullScreenElement !==  renderer.domElement) {
-      if ( renderer.domElement.requestFullscreen) {
-        renderer.domElement.requestFullscreen()
+    const fullScreenElement =
+      document.fullscreenElement || document.webkitFullscreenElement;
+    if (fullScreenElement !== renderer.domElement) {
+      if (renderer.domElement.requestFullscreen) {
+        renderer.domElement.requestFullscreen();
       } else if (renderer.domElement.webkitRequestFullscreen) {
-        renderer.domElement.webkitRequestFullscreen()
+        renderer.domElement.webkitRequestFullscreen();
       }
     } else {
       if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen()
-      } else if( document.exitFullscreen) {
-        document.exitFullscreen()
+        document.webkitExitFullscreen();
+      } else if (document.exitFullscreen) {
+        document.exitFullscreen();
       }
     }
-  })
+  });
 };

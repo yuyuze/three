@@ -14,6 +14,7 @@ import {
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import gsap from 'gsap';
+import { GUI } from 'dat.gui';
 
 console.log('OrbitControls', OrbitControls);
 const scene = new Scene();
@@ -32,44 +33,53 @@ const camera = new PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 1000);
 camera.position.z = 2;
 
 // red cube
-// const geometry = new BoxGeometry(1, 1, 1, 10, 10 , 10 );
+const geometry = new BoxGeometry(1, 1, 1, 10, 10, 10);
 
-const geometry = new BufferGeometry();
-const indices = [0, 1, 2, 2, 3, 0];
-const vertices = new Float32Array([
-  -1.0,
-  -1.0,
-  1.0, // v0
-  1.0,
-  -1.0,
-  1.0, // v1
-  1.0,
-  1.0,
-  1.0, // v2
+// const geometry = new BufferGeometry();
+// const indices = [0, 1, 2, 2, 3, 0];
+// const vertices = new Float32Array([
+//   -1.0,
+//   -1.0,
+//   1.0, // v0
+//   1.0,
+//   -1.0,
+//   1.0, // v1
+//   1.0,
+//   1.0,
+//   1.0, // v2
 
-  1.0,
-  1.0,
-  1.0, // v3
-  -1.0,
-  1.0,
-  1.0, // v4
-  -1.0,
-  -1.0,
-  1.0 // v5
-]);
-// 位置的顺序 索引
-geometry.setIndex(indices);
-geometry.setAttribute('position', new BufferAttribute(vertices, 3));
-
+//   1.0,
+//   1.0,
+//   1.0, // v3
+//   -1.0,
+//   1.0,
+//   1.0, // v4
+//   -1.0,
+//   -1.0,
+//   1.0 // v5
+// ]);
+// // 位置的顺序 索引
+// geometry.setIndex(indices);
+// geometry.setAttribute('position', new BufferAttribute(vertices, 3));
+const debugParam = {
+  color: 0xffffff,
+  test: '',
+  test2: '',
+  test3: ''
+};
 const material = new MeshBasicMaterial({
-  color: 0xff0000,
+  color: debugParam.color,
   wireframe: true
 });
 
 const mesh = new Mesh(geometry, material);
 
 camera.lookAt(mesh.position);
-
+const fn = {
+  spin: () => {
+    gsap.to(mesh.rotation, { duration: 1, y: mesh.rotation.y + Math.PI * 2 });
+  }
+};
 scene.add(camera);
 scene.add(mesh);
 // Axes helper
@@ -129,7 +139,29 @@ window.onload = () => {
     window.requestAnimationFrame(tick);
   }
   tick();
+  // h键显示隐藏
+  // const gui = new GUI({ closed: true });
+  const gui = new GUI();
 
+  // gui.hide();
+  const ceshiFolder = gui.addFolder('测试');
+  ceshiFolder.add(mesh.position, 'x', -3, 3, 1).name('mesh的x位置');
+  ceshiFolder.add(mesh, 'visible').name('mesh显隐');
+  ceshiFolder.add(mesh.material, 'wireframe').name('wireframe');
+  ceshiFolder.add(debugParam, 'test', ['一级', '二级']).name('下拉框');
+  ceshiFolder.add(debugParam, 'test3').name('text');
+
+  ceshiFolder
+    .add(debugParam, 'test2', {
+      二级: 0.01,
+      三级: 0.001
+    })
+    .name('下拉框');
+
+  ceshiFolder.addColor(debugParam, 'color').onChange(() => {
+    material.color.set(debugParam.color);
+  });
+  ceshiFolder.add(fn, 'spin');
   // window.addEventListener('mousemove', event => {
   //   cursor.x = event.clientX / window.innerWidth - 0.5;
   //   cursor.y = -(event.clientY / window.innerHeight - 0.5);
@@ -147,21 +179,26 @@ window.onload = () => {
     renderer.setSize(sizes.width, sizes.height);
   });
 
-  window.addEventListener('dblclick', function () {
-    const fullScreenElement =
-      document.fullscreenElement || document.webkitFullscreenElement;
-    if (fullScreenElement !== renderer.domElement) {
-      if (renderer.domElement.requestFullscreen) {
-        renderer.domElement.requestFullscreen();
-      } else if (renderer.domElement.webkitRequestFullscreen) {
-        renderer.domElement.webkitRequestFullscreen();
+  window.addEventListener(
+    'dblclick',
+    function (e) {
+      e.stopPropagation();
+      const fullScreenElement =
+        document.fullscreenElement || document.webkitFullscreenElement;
+      if (fullScreenElement !== renderer.domElement) {
+        if (renderer.domElement.requestFullscreen) {
+          renderer.domElement.requestFullscreen();
+        } else if (renderer.domElement.webkitRequestFullscreen) {
+          renderer.domElement.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
       }
-    } else {
-      if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.exitFullscreen) {
-        document.exitFullscreen();
-      }
-    }
-  });
+    },
+    true
+  );
 };
