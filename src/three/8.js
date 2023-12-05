@@ -10,11 +10,12 @@ import {
   Clock,
   OrthographicCamera,
   BufferGeometry,
-  BufferAttribute
+  BufferAttribute, Texture, TextureLoader, LoadingManager, RepeatWrapping, MirroredRepeatWrapping, NearestFilter
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import gsap from 'gsap';
 import { GUI } from 'dat.gui';
+import { load } from 'three/addons/libs/opentype.module.js';
 
 console.log('OrbitControls', OrbitControls);
 const scene = new Scene();
@@ -34,7 +35,50 @@ camera.position.z = 2;
 
 // red cube
 const geometry = new BoxGeometry(1, 1, 1, 10, 10, 10);
+// const image = new Image();
+// image.src = '/textures/door/color.jpg';
+// const textures = new Texture(image);
+// image.onload = function() {
+//   textures.needsUpdate = true
+// }
+const loadingManager = new LoadingManager();
+loadingManager.onStart = () => {
 
+}
+loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
+  console.log( 'Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+}
+loadingManager.onLoad = () => {
+
+}
+loadingManager.onError = () => {
+
+}
+const textureLoader = new TextureLoader(loadingManager)
+// load progress error function
+const colorTexture = textureLoader.load('/textures/checkerboard-8x8.png');
+// const colorTexture = textureLoader.load('/textures/door/color.jpg');
+const alphaTexture = textureLoader.load('/textures/door/alpha.jpg');
+const heightTexture = textureLoader.load('/textures/door/height.jpg');
+const normalTexture = textureLoader.load('/textures/door/normal.jpg');
+const ambientOcclusionTexture = textureLoader.load('/textures/door/ambientOcclusion.jpg');
+const metalnessTexture = textureLoader.load('/textures/door/metalness.jpg');
+const roughnessTexture = textureLoader.load('/textures/door/roughness.jpg');
+
+// colorTexture.repeat.x = 2;
+// colorTexture.repeat.y = 3;
+// // 镜像包裹
+// colorTexture.wrapS = MirroredRepeatWrapping;
+// // 包裹重复
+// colorTexture.wrapT = RepeatWrapping;
+//
+// colorTexture.offset.x = 0.5;
+// colorTexture.rotation = Math.PI / 4
+// 使用minfilter为nearestFilter要使用generateMipmaps false
+colorTexture.generateMipmaps = false;
+colorTexture.minFilter = NearestFilter;
+// 过滤器 小的纹理放大会模糊,可以锐化纹理
+colorTexture.magFilter = NearestFilter;
 // const geometry = new BufferGeometry();
 // const indices = [0, 1, 2, 2, 3, 0];
 // const vertices = new Float32Array([
@@ -68,8 +112,10 @@ const debugParam = {
   test3: ''
 };
 const material = new MeshBasicMaterial({
-  color: debugParam.color,
-  wireframe: true
+  // color: debugParam.color,
+  // wireframe: true
+  // 纹理贴图
+  map: colorTexture
 });
 
 const mesh = new Mesh(geometry, material);
@@ -97,12 +143,14 @@ window.onload = () => {
   document.querySelector('#root')?.append(renderer.domElement);
 
   console.log('canvas.width, canvas.height', canvas.width, canvas.height);
-  renderer.setSize(canvas.width, canvas.height);
+  // renderer.setSize(canvas.width, canvas.height);
   renderer.domElement.className = 'webgl';
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.05;
   controls.update();
+  // 对应切换屏幕的时候 做的操作防止他出现锯齿
+  renderer.setSize(sizes.width, sizes.height);
   // document.getElementById('root').appendChild(renderer.domElement)
   // time 存储事件
   //  let time = Date.now();
@@ -132,7 +180,7 @@ window.onload = () => {
     // camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 3;
     // // up是正的所以要负号
     // camera.position.y = cursor.y * 3;
-    camera.lookAt(mesh.position);
+    camera.lookAt(0, 0, 0);
     controls.update();
     // render
     renderer.render(scene, camera);
