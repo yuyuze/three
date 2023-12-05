@@ -10,7 +10,13 @@ import {
   Clock,
   OrthographicCamera,
   BufferGeometry,
-  BufferAttribute, Texture, TextureLoader, LoadingManager, RepeatWrapping, MirroredRepeatWrapping, NearestFilter
+  BufferAttribute,
+  Texture,
+  TextureLoader,
+  LoadingManager,
+  RepeatWrapping,
+  MirroredRepeatWrapping,
+  NearestFilter
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import gsap from 'gsap';
@@ -42,26 +48,30 @@ const geometry = new BoxGeometry(1, 1, 1, 10, 10, 10);
 //   textures.needsUpdate = true
 // }
 const loadingManager = new LoadingManager();
-loadingManager.onStart = () => {
-
-}
+loadingManager.onStart = () => {};
 loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
-  console.log( 'Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
-}
-loadingManager.onLoad = () => {
-
-}
-loadingManager.onError = () => {
-
-}
-const textureLoader = new TextureLoader(loadingManager)
+  console.log(
+    'Loading file: ' +
+      url +
+      '.\nLoaded ' +
+      itemsLoaded +
+      ' of ' +
+      itemsTotal +
+      ' files.'
+  );
+};
+loadingManager.onLoad = () => {};
+loadingManager.onError = () => {};
+const textureLoader = new TextureLoader(loadingManager);
 // load progress error function
 const colorTexture = textureLoader.load('/textures/checkerboard-8x8.png');
 // const colorTexture = textureLoader.load('/textures/door/color.jpg');
 const alphaTexture = textureLoader.load('/textures/door/alpha.jpg');
 const heightTexture = textureLoader.load('/textures/door/height.jpg');
 const normalTexture = textureLoader.load('/textures/door/normal.jpg');
-const ambientOcclusionTexture = textureLoader.load('/textures/door/ambientOcclusion.jpg');
+const ambientOcclusionTexture = textureLoader.load(
+  '/textures/door/ambientOcclusion.jpg'
+);
 const metalnessTexture = textureLoader.load('/textures/door/metalness.jpg');
 const roughnessTexture = textureLoader.load('/textures/door/roughness.jpg');
 
