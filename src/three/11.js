@@ -16,11 +16,14 @@ import {
   AmbientLight,
   SpotLight,
   CubeTextureLoader,
-  EquirectangularReflectionMapping
+  EquirectangularReflectionMapping, DoubleSide, TextureLoader, MeshMatcapMaterial, TorusGeometry
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import gsap from 'gsap';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
+
 
 console.log('OrbitControls', OrbitControls);
 const scene = new Scene();
@@ -37,18 +40,57 @@ camera.position.z = 10;
 const ambientLight = new AmbientLight(0xffffff, 0.5);
 ambientLight.position.set(0, 0, 0);
 const spotLight = new SpotLight(0xffffff, 0.5);
-const geometry = new SphereGeometry(4);
-
-const material = new MeshStandardMaterial({});
+// const geometry = new SphereGeometry(4);
+//
+// const material = new MeshStandardMaterial({});
 // material.envMap = blueTexture;
 // material.metalness = 1;
 // material.roughness = 0;
-const mesh = new Mesh(geometry, material);
+// const mesh = new Mesh(geometry, material);
 
-camera.lookAt(mesh.position);
+// camera.lookAt(mesh.position);
 
 scene.add(camera);
-scene.add(mesh);
+// scene.add(mesh);
+const fontLoader = new FontLoader()
+const textureLoad = new TextureLoader();
+const matcaps1 = textureLoad.load('/textures/matcaps/3.png')
+const material = new MeshMatcapMaterial()
+material.matcap = matcaps1;
+
+fontLoader.load('/helvetiker_regular.typeface.json', (font) =>{
+    const textGeometry = new TextGeometry('Hello World', {
+      font: font,
+      size: 0.5,
+      height: 0.2,
+      curveSegments: 12,
+      bevelEnabled: true,
+      bevelThickness: 0.07,
+      bevelSize: 0.005,
+      bevelOffset: 0,
+      bevelSegments: 5
+    })
+    textGeometry.computeBoundingBox();
+    console.log(textGeometry.boundingBox);
+    textGeometry.center()
+
+    material.side = DoubleSide;
+    const mesh = new Mesh(textGeometry, material);
+
+    scene.add(mesh);
+})
+for (let i = 0; i < 1000; i++) {
+  const torusGeometry = new TorusGeometry( 0.3, 0.1, 16, 100 );
+  const mesh = new Mesh(torusGeometry, material);
+  const random = Math.random();
+  mesh.position.x = (Math.random() - 0.5) * 20;
+  mesh.position.y = (Math.random() - 0.5) * 20;
+  mesh.position.z = (Math.random() - 0.5) * 20;
+  mesh.rotation.x = random * Math.PI;
+  mesh.rotation.y = random * Math.PI;
+  mesh.scale.set(random, random, random);
+  scene.add(mesh);
+}
 spotLight.position.set(6, 6, 6);
 // Axes helper
 const axesHelper = new AxesHelper(5);
@@ -67,7 +109,7 @@ window.onload = () => {
   document.querySelector('#root')?.append(renderer.domElement);
 
   console.log('canvas.width, canvas.height', canvas.width, canvas.height);
-  renderer.setSize(canvas.width, canvas.height);
+  renderer.setSize(sizes.width, sizes.height);
   renderer.domElement.className = 'webgl';
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
@@ -102,7 +144,6 @@ window.onload = () => {
     // camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 3;
     // // up是正的所以要负号
     // camera.position.y = cursor.y * 3;
-    camera.lookAt(mesh.position);
     controls.update();
     // render
     renderer.render(scene, camera);
